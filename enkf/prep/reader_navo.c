@@ -54,7 +54,7 @@ void reader_navo(char* fname, int fid, obsmeta* meta, grid* g, observations* obs
     size_t tunits_len;
     double tunits_multiple, tunits_offset;
     char* basename;
-    int i, nobs_read;
+    int i, nobs_read, start;
 
     for (i = 0; i < meta->npars; ++i) {
         if (strcasecmp(meta->pars[i].name, "ADDBIAS") == 0)
@@ -106,14 +106,15 @@ void reader_navo(char* fname, int fid, obsmeta* meta, grid* g, observations* obs
     ncw_get_var_double(ncid, varid_time, time);
     ncw_inq_attlen(ncid, varid_time, "units", &tunits_len);
     ncw_get_att_text(ncid, varid_time, "units", tunits);
-    basename[13] = 0;
-    if (!str2int(&basename[11], &day))
+    start = 30;
+    basename[start] = 0;
+    if (!str2int(&basename[start-2], &day))
         enkf_quit("NAVO reader: could not convert file name \"%s\" to date", fname);
-    basename[11] = 0;
-    if (!str2int(&basename[9], &month))
+    basename[start-2] = 0;
+    if (!str2int(&basename[start-4], &month))
         enkf_quit("NAVO reader: could not convert file name \"%s\" to date", fname);
-    basename[9] = 0;
-    if (!str2int(&basename[5], &year))
+    basename[start-4] = 0;
+    if (!str2int(&basename[start-8], &year))
         enkf_quit("NAVO reader: could not convert file name \"%s\" to date", fname);
     snprintf(&tunits[tunits_len], MAXSTRLEN - tunits_len, " since %4d-%02d-%02d", year, month, day);
 
